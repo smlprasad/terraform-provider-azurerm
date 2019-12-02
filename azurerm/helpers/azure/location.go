@@ -40,6 +40,7 @@ func SchemaLocationDeprecated() *schema.Schema {
 		Type:             schema.TypeString,
 		ForceNew:         true,
 		Optional:         true,
+		Computed:         true,
 		StateFunc:        NormalizeLocation,
 		DiffSuppressFunc: SuppressLocationDiff,
 		Deprecated:       "location is no longer used",
