@@ -428,6 +428,14 @@ Splitting the Virtual Machine resource in two allows us to both provide finer-gr
 
 The existing `azurerm_virtual_machine` Resource will continue to be available in it's current form, however it will eventually be deprecated and we recommend using the new resources going forward.
 
+### Resource: `azurerm_virtual_machine_extension`
+
+The deprecated field `location` will be removed - this is now pulled from the Virtual Machine specified in `virtual_machine_id`.
+
+The deprecated field `resource_group_name` will be removed - this has been superseded by `virtual_machine_id`.
+
+The deprecated field `virtual_machine_name` will be removed - this has been superseded by `virtual_machine_id`.
+
 ### Resource: `azurerm_virtual_machine_scale_set`
 
 The `azurerm_virtual_machine_scale_set` resource will be deprecated in favour of two new resources: `azurerm_linux_virtual_machine_scale_set` and `azurerm_windows_virtual_machine_scale_set`.
