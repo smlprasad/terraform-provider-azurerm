@@ -13,6 +13,7 @@ import (
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/helpers/tf"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/features"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/locks"
+	computeSvc "github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/services/compute"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/timeouts"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/utils"
 )
@@ -95,13 +96,12 @@ func resourceArmVirtualMachineDataDiskAttachmentCreateUpdate(d *schema.ResourceD
 	defer cancel()
 
 	virtualMachineId := d.Get("virtual_machine_id").(string)
-	parsedVirtualMachineId, err := azure.ParseAzureResourceID(virtualMachineId)
+	id, err := computeSvc.ParseVirtualMachineID(virtualMachineId)
 	if err != nil {
-		return fmt.Errorf("Error parsing Virtual Machine ID %q: %+v", virtualMachineId, err)
+		return err
 	}
-
-	resourceGroup := parsedVirtualMachineId.ResourceGroup
-	virtualMachineName := parsedVirtualMachineId.Path["virtualMachines"]
+	resourceGroup := id.Base.ResourceGroup
+	virtualMachineName := id.Name
 
 	locks.ByName(virtualMachineName, virtualMachineResourceName)
 	defer locks.UnlockByName(virtualMachineName, virtualMachineResourceName)

@@ -16,6 +16,7 @@ import (
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/helpers/tf"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/helpers/validate"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/features"
+	computeSvc "github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/services/compute"
 )
 
 // NOTE: Test `TestAccAzureRMVirtualMachine_enableAnWithVM` requires a machine of size `D8_v3` which is large/expensive - you may wish to ignore this test"
@@ -593,13 +594,13 @@ func TestAccAzureRMVirtualMachine_ultraSSD(t *testing.T) {
 
 func testCheckAndStopAzureRMVirtualMachine(vm *compute.VirtualMachine) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		vmID, err := azure.ParseAzureResourceID(*vm.ID)
+		vmID, err := computeSvc.ParseVirtualMachineID(*vm.ID)
 		if err != nil {
 			return fmt.Errorf("Unable to parse virtual machine ID %s, %+v", *vm.ID, err)
 		}
 
-		name := vmID.Path["virtualMachines"]
-		resourceGroup := vmID.ResourceGroup
+		name := vmID.Name
+		resourceGroup := vmID.Base.ResourceGroup
 
 		client := testAccProvider.Meta().(*ArmClient).Compute.VMClient
 		ctx := testAccProvider.Meta().(*ArmClient).StopContext

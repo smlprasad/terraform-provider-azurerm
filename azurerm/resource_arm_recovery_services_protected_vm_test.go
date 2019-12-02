@@ -7,9 +7,9 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/helpers/azure"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/helpers/tf"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/features"
+	computeSvc "github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/services/compute"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/utils"
 )
 
@@ -163,17 +163,15 @@ func testCheckAzureRMRecoveryServicesProtectedVmDestroy(s *terraform.State) erro
 		vaultName := rs.Primary.Attributes["recovery_vault_name"]
 		vmId := rs.Primary.Attributes["source_vm_id"]
 
-		parsedVmId, err := azure.ParseAzureResourceID(vmId)
+		parsedVmId, err := computeSvc.ParseVirtualMachineID(vmId)
 		if err != nil {
 			return fmt.Errorf("[ERROR] Unable to parse source_vm_id '%s': %+v", vmId, err)
 		}
-		vmName, hasName := parsedVmId.Path["virtualMachines"]
-		if !hasName {
-			return fmt.Errorf("[ERROR] parsed source_vm_id '%s' doesn't contain 'virtualMachines'", vmId)
-		}
+		vmResourceGroup := parsedVmId.Base.ResourceGroup
+		vmName := parsedVmId.Name
 
-		protectedItemName := fmt.Sprintf("VM;iaasvmcontainerv2;%s;%s", parsedVmId.ResourceGroup, vmName)
-		containerName := fmt.Sprintf("iaasvmcontainer;iaasvmcontainerv2;%s;%s", parsedVmId.ResourceGroup, vmName)
+		protectedItemName := fmt.Sprintf("VM;iaasvmcontainerv2;%s;%s", vmResourceGroup, vmName)
+		containerName := fmt.Sprintf("iaasvmcontainer;iaasvmcontainerv2;%s;%s", vmResourceGroup, vmName)
 
 		client := testAccProvider.Meta().(*ArmClient).RecoveryServices.ProtectedItemsClient
 		ctx := testAccProvider.Meta().(*ArmClient).StopContext
@@ -210,17 +208,15 @@ func testCheckAzureRMRecoveryServicesProtectedVmExists(resourceName string) reso
 		vmId := rs.Primary.Attributes["source_vm_id"]
 
 		//get VM name from id
-		parsedVmId, err := azure.ParseAzureResourceID(vmId)
+		parsedVmId, err := computeSvc.ParseVirtualMachineID(vmId)
 		if err != nil {
 			return fmt.Errorf("[ERROR] Unable to parse source_vm_id '%s': %+v", vmId, err)
 		}
-		vmName, hasName := parsedVmId.Path["virtualMachines"]
-		if !hasName {
-			return fmt.Errorf("[ERROR] parsed source_vm_id '%s' doesn't contain 'virtualMachines'", vmId)
-		}
+		vmResourceGroup := parsedVmId.Base.ResourceGroup
+		vmName := parsedVmId.Name
 
-		protectedItemName := fmt.Sprintf("VM;iaasvmcontainerv2;%s;%s", parsedVmId.ResourceGroup, vmName)
-		containerName := fmt.Sprintf("iaasvmcontainer;iaasvmcontainerv2;%s;%s", parsedVmId.ResourceGroup, vmName)
+		protectedItemName := fmt.Sprintf("VM;iaasvmcontainerv2;%s;%s", vmResourceGroup, vmName)
+		containerName := fmt.Sprintf("iaasvmcontainer;iaasvmcontainerv2;%s;%s", vmResourceGroup, vmName)
 
 		client := testAccProvider.Meta().(*ArmClient).RecoveryServices.ProtectedItemsClient
 		ctx := testAccProvider.Meta().(*ArmClient).StopContext

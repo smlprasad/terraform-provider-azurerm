@@ -20,6 +20,7 @@ import (
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/helpers/validate"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/features"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/locks"
+	computeSvc "github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/services/compute"
 	intStor "github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/services/storage"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/tags"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/timeouts"
@@ -792,12 +793,12 @@ func resourceArmVirtualMachineRead(d *schema.ResourceData, meta interface{}) err
 	ctx, cancel := timeouts.ForRead(meta.(*ArmClient).StopContext, d)
 	defer cancel()
 
-	id, err := azure.ParseAzureResourceID(d.Id())
+	id, err := computeSvc.ParseVirtualMachineID(d.Id())
 	if err != nil {
 		return err
 	}
-	resGroup := id.ResourceGroup
-	name := id.Path["virtualMachines"]
+	resGroup := id.Base.ResourceGroup
+	name := id.Name
 
 	resp, err := vmclient.Get(ctx, resGroup, name, "")
 	if err != nil {
@@ -922,12 +923,12 @@ func resourceArmVirtualMachineDelete(d *schema.ResourceData, meta interface{}) e
 	ctx, cancel := timeouts.ForDelete(meta.(*ArmClient).StopContext, d)
 	defer cancel()
 
-	id, err := azure.ParseAzureResourceID(d.Id())
+	id, err := computeSvc.ParseVirtualMachineID(d.Id())
 	if err != nil {
 		return err
 	}
-	resGroup := id.ResourceGroup
-	name := id.Path["virtualMachines"]
+	resGroup := id.Base.ResourceGroup
+	name := id.Name
 
 	locks.ByName(name, virtualMachineResourceName)
 	defer locks.UnlockByName(name, virtualMachineResourceName)

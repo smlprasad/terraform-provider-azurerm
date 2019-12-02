@@ -10,6 +10,7 @@ import (
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/helpers/azure"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/helpers/tf"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/features"
+	computeSvc "github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/services/compute"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/utils"
 )
 
@@ -241,14 +242,13 @@ func testCheckAzureRMVirtualMachineDataDiskAttachmentExists(resourceName string)
 		}
 
 		virtualMachineId := rs.Primary.Attributes["virtual_machine_id"]
-
-		id, err := azure.ParseAzureResourceID(virtualMachineId)
+		id, err := computeSvc.ParseVirtualMachineID(virtualMachineId)
 		if err != nil {
 			return err
 		}
 
-		virtualMachineName := id.Path["virtualMachines"]
-		resourceGroup := id.ResourceGroup
+		resourceGroup := id.Base.ResourceGroup
+		virtualMachineName := id.Name
 
 		client := testAccProvider.Meta().(*ArmClient).Compute.VMClient
 		ctx := testAccProvider.Meta().(*ArmClient).StopContext
@@ -288,13 +288,13 @@ func testCheckAzureRMVirtualMachineDataDiskAttachmentDestroy(s *terraform.State)
 
 		virtualMachineId := rs.Primary.Attributes["virtual_machine_id"]
 
-		id, err := azure.ParseAzureResourceID(virtualMachineId)
+		id, err := computeSvc.ParseVirtualMachineID(virtualMachineId)
 		if err != nil {
 			return err
 		}
 
-		virtualMachineName := id.Path["virtualMachines"]
-		resourceGroup := id.ResourceGroup
+		resourceGroup := id.Base.ResourceGroup
+		virtualMachineName := id.Name
 
 		client := testAccProvider.Meta().(*ArmClient).Compute.VMClient
 		ctx := testAccProvider.Meta().(*ArmClient).StopContext

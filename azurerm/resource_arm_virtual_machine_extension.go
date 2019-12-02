@@ -16,12 +16,14 @@ import (
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/utils"
 )
 
-func resourceArmVirtualMachineExtensions() *schema.Resource {
+// TODO: ID Parser(s), introducing the new field, separate update method
+
+func resourceArmVirtualMachineExtension() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceArmVirtualMachineExtensionsCreateUpdate,
-		Read:   resourceArmVirtualMachineExtensionsRead,
-		Update: resourceArmVirtualMachineExtensionsCreateUpdate,
-		Delete: resourceArmVirtualMachineExtensionsDelete,
+		Create: resourceArmVirtualMachineExtensionCreateUpdate,
+		Read:   resourceArmVirtualMachineExtensionRead,
+		Update: resourceArmVirtualMachineExtensionCreateUpdate,
+		Delete: resourceArmVirtualMachineExtensionDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -90,7 +92,7 @@ func resourceArmVirtualMachineExtensions() *schema.Resource {
 	}
 }
 
-func resourceArmVirtualMachineExtensionsCreateUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceArmVirtualMachineExtensionCreateUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*ArmClient).Compute.VMExtensionClient
 	ctx, cancel := timeouts.ForCreateUpdate(meta.(*ArmClient).StopContext, d)
 	defer cancel()
@@ -166,10 +168,10 @@ func resourceArmVirtualMachineExtensionsCreateUpdate(d *schema.ResourceData, met
 
 	d.SetId(*read.ID)
 
-	return resourceArmVirtualMachineExtensionsRead(d, meta)
+	return resourceArmVirtualMachineExtensionRead(d, meta)
 }
 
-func resourceArmVirtualMachineExtensionsRead(d *schema.ResourceData, meta interface{}) error {
+func resourceArmVirtualMachineExtensionRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*ArmClient).Compute.VMExtensionClient
 	ctx, cancel := timeouts.ForRead(meta.(*ArmClient).StopContext, d)
 	defer cancel()
@@ -218,7 +220,7 @@ func resourceArmVirtualMachineExtensionsRead(d *schema.ResourceData, meta interf
 	return tags.FlattenAndSet(d, resp.Tags)
 }
 
-func resourceArmVirtualMachineExtensionsDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceArmVirtualMachineExtensionDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*ArmClient).Compute.VMExtensionClient
 	ctx, cancel := timeouts.ForDelete(meta.(*ArmClient).StopContext, d)
 	defer cancel()

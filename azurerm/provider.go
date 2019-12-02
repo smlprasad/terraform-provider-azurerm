@@ -480,7 +480,7 @@ func Provider() terraform.ResourceProvider {
 		"azurerm_user_assigned_identity":                                                 resourceArmUserAssignedIdentity(),
 		"azurerm_virtual_hub":                                                            resourceArmVirtualHub(),
 		"azurerm_virtual_machine_data_disk_attachment":                                   resourceArmVirtualMachineDataDiskAttachment(),
-		"azurerm_virtual_machine_extension":                                              resourceArmVirtualMachineExtensions(),
+		"azurerm_virtual_machine_extension":                                              resourceArmVirtualMachineExtension(),
 		"azurerm_virtual_machine_scale_set":                                              resourceArmVirtualMachineScaleSet(),
 		"azurerm_virtual_machine":                                                        resourceArmVirtualMachine(),
 		"azurerm_virtual_network_gateway_connection":                                     resourceArmVirtualNetworkGatewayConnection(),
