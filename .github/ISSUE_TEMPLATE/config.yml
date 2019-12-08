@@ -1,1 +1,11 @@
 blank_issues_enabled: false
+contact_links:
+  - name: Terraform Core Bug Reports and Feature Requests
+    url: https://github.com/hashicorp/terraform/issues/new/choose
+    about: Terraform Core, which handles the Terraform configuration language, CLI commands, and resource dependency graph, has its own codebase. Bug reports and feature requests for those pieces of functionality should be directed to that repository.
+  - name: Terraform Language or Workflow Question
+    url: https://www.terraform.io/community.html
+    about: Please look to the resources found on this page for general Terraform questions.
+  - name: Security Vulnerabilites
+    url: https://www.hashicorp.com/security.html
+    about: Please report security vulnerabilities responsibly.
